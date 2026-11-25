@@ -6,6 +6,9 @@ numbers -> 3 heroes -> grid -> HOW SURE legend -> map -> ALSO -> DATE CHECK)
 with the lead order swapped (Hormuz first) and top-1's date errors fixed:
 Shenzhou liftoff 00:18, no Tube strike, no Akwe grid item,
 Bangladesh as +36% only.
+Tweaks vs v1: black top band + black masthead with red-diamond subline,
+segmented colour region strip, kicker/dateline strips below hero+grid
+illustrations carrying the tag pills (pills moved off the artwork).
 """
 import os
 from PIL import Image, ImageDraw, ImageFont
@@ -61,6 +64,35 @@ TAG_COLOR = {
 # ---------------------------------------------------------------- data ----
 REGIONS = [("ASIA", 7), ("MIDDLE EAST", 6), ("EUROPE", 11), ("AMERICAS", 5),
            ("AFRICA", 4), ("OCEANIA", 5), ("WORLD", 2)]
+
+REGION_COLORS = {
+    "ASIA": (178, 38, 30),
+    "MIDDLE EAST": (214, 110, 16),
+    "EUROPE": (41, 98, 168),
+    "AMERICAS": (46, 125, 50),
+    "AFRICA": (15, 118, 110),
+    "OCEANIA": (124, 58, 200),
+    "WORLD": (105, 105, 105),
+}
+
+HERO_KICKERS = [
+    "WAR AT SEA \u00b7 STRAIT OF HORMUZ",
+    "SELL-OFF \u00b7 SEOUL \u00b7 TAIPEI \u00b7 TOKYO \u00b7 MARKETS",
+    "LIFTOFF \u00b7 JIUQUAN, CHINA \u00b7 SPACE",
+]
+
+GRID_KICKERS = [
+    "CANBERRA, AUSTRALIA",
+    "HODEIDAH \u00b7 RAS TANURA",
+    "DHAKA, BANGLADESH",
+    "BOGOR, INDONESIA",
+    "SAMARA, RUSSIA",
+    "GAZA CITY",
+    "LONDON, UK",
+    "LONDON, UK",
+    "JERUSALEM",
+    "STRASBOURG",
+]
 
 UTC_ITEMS = [
     ("00:18", "Shenzhou-24 lifts off"),
@@ -224,6 +256,29 @@ def chip(draw, x, y, text, size=10):
                            fill=TAG_COLOR[text])
     draw.text((x + 6, y + 4), text, font=f, fill=(255, 255, 255))
     return w
+
+
+def kicker(draw, x, y, w, text, tag, base_size=10, min_size=7.5,
+           first_red=False):
+    """Dateline strip: text left, tag pill at the right end; shrinks to fit."""
+    size = base_size
+    while size > min_size:
+        f = sans_b(int(round(size)))
+        pill_w = tw(draw, tag, sans_b(int(round(size)))) + 12
+        if tw(draw, text, f) + 6 + pill_w <= w:
+            break
+        size -= 0.5
+    ps = int(round(size))
+    f = sans_b(ps)
+    if first_red and " \u00b7 " in text:
+        first, rest = text.split(" \u00b7 ", 1)
+        draw.text((x, y + 2), first, font=f, fill=RUST)
+        fx = x + tw(draw, first, f)
+        draw.text((fx, y + 2), " \u00b7 " + rest, font=sans(ps), fill=GREY)
+    else:
+        draw.text((x, y + 2), text, font=f, fill=NAVY_D)
+    pill_w = tw(draw, tag, sans_b(ps)) + 12
+    chip(draw, x + w - pill_w, y, tag, size=ps)
 
 
 def fit_font(draw, text, start, min_size, max_w, bold=True, serif_font=False):
@@ -434,26 +489,42 @@ def draw_map(draw, x, y, w, h):
 
 # ----------------------------------------------------------- sections -----
 def section_masthead(draw):
-    draw.rectangle([0, 0, W, 88], fill=CREAM)
+    # black top band, like top 1
+    draw.rectangle([0, 0, W, 20], fill=(0, 0, 0))
+    fb = sans_b(11)
+    draw.text((M, 4), "THE WORLD IN ONE DAY", font=fb, fill=GOLD)
+    right = "40 STORIES \u00b7 ALL FROM WEDNESDAY 25 NOVEMBER 2026"
+    draw.text((W - M - tw(draw, right, fb), 4), right, font=fb,
+              fill=(255, 255, 255))
+    draw.rectangle([0, 20, W, 88], fill=CREAM)
     title = "Wednesday 25 November 2026"
-    f = fit_font(draw, title, 46, 30, CW, bold=True, serif_font=True)
-    draw.text(((W - tw(draw, title, f)) / 2, 10), title, font=f, fill=NAVY_D)
-    sub = ("Tankers burn in Hormuz  \u00b7  Asia's chip stocks crash  "
-           "\u00b7  A Pakistani flies to Tiangong")
+    f = fit_font(draw, title, 44, 30, CW, bold=True, serif_font=True)
+    draw.text(((W - tw(draw, title, f)) / 2, 24), title, font=f, fill=(0, 0, 0))
+    parts = ["Tankers burn in Hormuz", "Asia's chip stocks crash",
+             "A Pakistani flies to Tiangong"]
     fs = sans(14)
-    draw.text(((W - tw(draw, sub, fs)) / 2, 62), sub, font=fs, fill=INK)
+    dia = " \u25c6 "
+    total = sum(tw(draw, p, fs) for p in parts) + 2 * tw(draw, dia, fs)
+    x = (W - total) / 2
+    for i, p in enumerate(parts):
+        draw.text((x, 72), p, font=fs, fill=INK)
+        x += tw(draw, p, fs)
+        if i < 2:
+            draw.text((x, 72), dia, font=fs, fill=RUST)
+            x += tw(draw, dia, fs)
     draw.line([M, 88, W - M, 88], fill=NAVY, width=2)
 
 
 def section_regions(draw):
-    draw.rectangle([0, 88, W, 114], fill=NAVY)
-    parts = []
-    for name, n in REGIONS:
-        parts.append("%s %d" % (name, n))
-    text = "  \u00b7  ".join(parts) + "   =   40 STORIES"
-    f = fit_font(draw, text, 14, 10, CW, bold=True)
-    draw.text(((W - tw(draw, text, f)) / 2, 95), text, font=f,
-              fill=(255, 255, 255))
+    widths = [179, 154, 269, 128, 102, 128, 64]
+    x = 0
+    for (name, n), wseg in zip(REGIONS, widths):
+        draw.rectangle([x, 88, x + wseg, 114], fill=REGION_COLORS[name])
+        text = "%s %d" % (name, n)
+        f = fit_font(draw, text, 13, 9, wseg - 8, bold=True)
+        draw.text((x + (wseg - tw(draw, text, f)) / 2, 95), text, font=f,
+                  fill=(255, 255, 255))
+        x += wseg
 
 
 def section_utc(draw):
@@ -499,8 +570,13 @@ def section_heroes(draw, img):
         draw.text((x + 10, y0 + 8), str(hero["n"]), font=serif_b(20),
                   fill=(255, 255, 255),
                   stroke_width=2, stroke_fill=NAVY_D)
-        chip(draw, x + col_w - 92, y0 + 8, hero["tag"], size=10)
-        ty = y0 + ih + 10
+        # kicker strip below the illustration, tag pill at its right end
+        ky = y0 + ih + 1
+        draw.line([x + 1, ky + 18, x + col_w - 1, ky + 18],
+                  fill=(210, 206, 192), width=1)
+        kicker(draw, x + 8, ky, col_w - 16, HERO_KICKERS[i],
+               hero["tag"], base_size=10, min_size=8, first_red=True)
+        ty = y0 + ih + 24
         ty = draw_wrapped(draw, hero["head"], serif_b(19), x + 10, ty,
                           col_w - 20, NAVY_D, leading=23)
         draw_wrapped(draw, hero["deck"], sans(12), x + 10, ty + 4,
@@ -510,28 +586,33 @@ def section_heroes(draw, img):
 def section_grid(draw):
     y0 = 414
     col_w = (CW - 4 * 8) / 5.0
-    row_h, gap = 120, 8
+    row_h, gap = 126, 4
     for idx, card in enumerate(GRID):
         r, c = divmod(idx, 5)
         x = M + c * (col_w + gap)
         y = y0 + r * (row_h + gap)
         draw.rectangle([x, y, x + col_w, y + row_h], fill=PAPER,
                        outline=(210, 206, 192), width=1)
-        ih = 38
+        ih = 32
         draw.rectangle([x + 1, y + 1, x + col_w - 1, y + ih],
                        fill=SKY if idx % 2 == 0 else TEAL_L)
         illu_icon(draw, card["illu"], x, y + 1, col_w, ih)
         draw.text((x + 6, y + 4), str(card["n"]), font=sans_b(11),
                   fill=NAVY_D)
-        chip(draw, x + col_w - 76, y + 5, card["tag"], size=9)
-        ty = draw_wrapped(draw, card["head"], sans_b(12), x + 7, y + ih + 5,
+        # kicker strip below the icon strip, tag pill at its right end
+        ky = y + ih + 1
+        draw.line([x + 1, ky + 14, x + col_w - 1, ky + 14],
+                  fill=(210, 206, 192), width=1)
+        kicker(draw, x + 6, ky, col_w - 12, GRID_KICKERS[idx],
+               card["tag"], base_size=9, min_size=7.5, first_red=False)
+        ty = draw_wrapped(draw, card["head"], sans_b(12), x + 7, y + ih + 17,
                           col_w - 14, NAVY_D, leading=13.5)
         draw_wrapped(draw, card["deck"], sans(10), x + 7, ty + 2,
                      col_w - 14, INK, leading=11.5)
 
 
 def section_legend_map(draw):
-    y0, y1 = 662, 758
+    y0, y1 = 670, 758
     draw.rectangle([0, y0, W, y1], fill=CREAM)
     draw.line([M, y0, W - M, y0], fill=(200, 196, 182), width=1)
     draw.text((M, y0 + 8), "HOW SURE", font=sans_b(13), fill=NAVY_D)
