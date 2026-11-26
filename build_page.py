@@ -9,6 +9,10 @@ Bangladesh as +36% only.
 Tweaks vs v1: black top band + black masthead with red-diamond subline,
 segmented colour region strip, kicker/dateline strips below hero+grid
 illustrations carrying the tag pills (pills moved off the artwork).
+v3: 33 stories (ALSO 27 -> 20), bigger minimum type (kicker 9, pills 11,
+fit_font 11), grid mini-scenes instead of flat icons, hero source lines,
+HOW SURE strip above the grid, bigger spread map pins + region legend,
+sources line + black footer band.
 """
 import os
 from PIL import Image, ImageDraw, ImageFont
@@ -62,8 +66,8 @@ TAG_COLOR = {
 }
 
 # ---------------------------------------------------------------- data ----
-REGIONS = [("ASIA", 7), ("MIDDLE EAST", 6), ("EUROPE", 11), ("AMERICAS", 5),
-           ("AFRICA", 4), ("OCEANIA", 5), ("WORLD", 2)]
+REGIONS = [("ASIA", 7), ("MIDDLE EAST", 6), ("EUROPE", 9), ("AMERICAS", 4),
+           ("AFRICA", 3), ("OCEANIA", 3), ("WORLD", 1)]
 
 REGION_COLORS = {
     "ASIA": (178, 38, 30),
@@ -77,16 +81,16 @@ REGION_COLORS = {
 
 HERO_KICKERS = [
     "WAR AT SEA \u00b7 STRAIT OF HORMUZ",
-    "SELL-OFF \u00b7 SEOUL \u00b7 TAIPEI \u00b7 TOKYO \u00b7 MARKETS",
+    "SELL-OFF \u00b7 SEOUL \u00b7 TOKYO",
     "LIFTOFF \u00b7 JIUQUAN, CHINA \u00b7 SPACE",
 ]
 
 GRID_KICKERS = [
-    "CANBERRA, AUSTRALIA",
-    "HODEIDAH \u00b7 RAS TANURA",
-    "DHAKA, BANGLADESH",
-    "BOGOR, INDONESIA",
-    "SAMARA, RUSSIA",
+    "CANBERRA",
+    "HODEIDAH PORT",
+    "DHAKA",
+    "BOGOR",
+    "SAMARA",
     "GAZA CITY",
     "LONDON, UK",
     "LONDON, UK",
@@ -95,11 +99,11 @@ GRID_KICKERS = [
 ]
 
 UTC_ITEMS = [
-    ("00:18", "Shenzhou-24 lifts off"),
-    ("00:30", "Australia CPI +4.9%"),
-    ("03:56", "Crew docks at Tiangong"),
-    ("06:30", "Kospi closes -6.2%"),
-    ("18:45", "Hera unveils Dimorphos images"),
+    ("00:18", "Shenzhou lifts off"),
+    ("00:30", "Aus CPI +4.9%"),
+    ("03:56", "Crew docks"),
+    ("06:30", "Kospi -6.2%"),
+    ("18:45", "Hera: Dimorphos images"),
 ]
 
 NUMBERS = [
@@ -129,13 +133,19 @@ HEROES = [
      "illu": "rocket"},
 ]
 
+HERO_SOURCES = [
+    "REUTERS \u00b7 IRNA \u00b7 OILPRICE",
+    "WSJ \u00b7 AP \u00b7 JOONGANG DAILY",
+    "REUTERS \u00b7 XINHUA \u00b7 PEOPLE.CN",
+]
+
 GRID = [
     {"n": 4, "tag": "OFFICIAL", "illu": "treaty",
      "head": "Solomons sign security treaty with Australia",
      "deck": "A$740m over 10 years; Canberra is the primary security "
              "partner, no foreign bases."},
     {"n": 5, "tag": "OFFICIAL", "illu": "port",
-     "head": "Coalition strikes Hodeidah port; 4 drones downed over Ras Tanura",
+     "head": "Coalition hits Hodeidah; 4 drones downed",
      "deck": "After a warning, Houthis threaten Jeddah and Red Sea ports."},
     {"n": 6, "tag": "OFFICIAL", "illu": "shirt",
      "head": "Garment workers win 36% pay rise",
@@ -150,22 +160,22 @@ GRID = [
      "deck": "Fires at Syzran and Kuibyshev plants; governor says 1 killed, "
              "145 drones downed."},
     {"n": 9, "tag": "OFFICIAL", "illu": "building",
-     "head": "Strike kills Hamas official and his family of four",
-     "deck": "Col. Muhammad Majid Abu al-Awf, his wife and two daughters "
-             "die in al-Shati camp, Gaza City."},
+     "head": "Hamas official killed with family of four",
+     "deck": "Col. Abu al-Awf, his wife and two daughters "
+             "die in al-Shati camp."},
     {"n": 10, "tag": "OFFICIAL", "illu": "bolt",
-     "head": "UK energy bills to jump 26% in January",
+     "head": "UK energy bills jump 26% in January",
      "deck": "Ofgem cap rises to \u00a32,166 a year - \u00a3443 more for a "
              "typical household."},
     {"n": 11, "tag": "OFFICIAL", "illu": "shield",
-     "head": "Met still institutionally racist, review finds",
+     "head": "Met still institutionally racist",
      "deck": "0 of 14 recommendations show 'good progress'; scandals 'highly likely'."},
     {"n": 12, "tag": "OFFICIAL", "illu": "scales",
-     "head": "Judges urge prosecutors to drop gravest Netanyahu case",
+     "head": "Judges: drop gravest Netanyahu case",
      "deck": "Court sees 'considerable difficulties' in the Case 4000 "
              "bribery charge; AG to weigh it."},
     {"n": 13, "tag": "OFFICIAL", "illu": "stars",
-     "head": "EU plans \u20ac50bn AI and quantum fund",
+     "head": "EU plans \u20ac50bn AI, quantum fund",
      "deck": "Sovereign Tech Equity Fund proposed in Strasbourg; needs "
              "member states and Parliament."},
 ]
@@ -176,27 +186,20 @@ ALSO = [
     "Balkans summit: five leaders, no Serbia",
     "Ukraine blackout: 112 drones, 88 downed",
     "ESA's Hera unveils Dimorphos images",
-    "Pete Edochie dies at 79",
     "Houthis claim Ras Tanura refinery hit",
     "Cartagena siege ends, hostages freed",
-    "UN: 16 Days against gender violence begin",
     "Trump shelves Russia business deals",
-    "Sydney CBD gas leak shuts streets",
     "Thanksgiving storm hits 25 states",
     "Sensex jumps 1.8% to 83,938",
-    "Ex-officer guilty of double murder",
     "Huawei rejects US verdict",
     "Gaza: winter aid blocked as storm looms",
-    "Tonight: Lille-Bayern, PSG-Roma (UCL)",
     "Sudan: RSF drone strikes kill 19 in Damazin",
     "Libya vows retaliation after drone strike",
     "Merz: Russia escalating threats to Europe",
     "US set to raise tariffs on China, EU, 14 more",
     "Ramaphosa wins Phala Phala court battle",
-    "Bodies of 6 recovered off Mississippi",
     "Iraq court backs Baghdad's oil takeover",
     "EasyJet profit falls 89% to \u00a371m",
-    "Spain votes Sunday; S\u00e1nchez warns of right",
     "EU court orders cage-ban timeline",
 ]
 
@@ -248,7 +251,7 @@ def draw_wrapped(draw, text, font, x, y, max_w, fill, leading=None):
     return y
 
 
-def chip(draw, x, y, text, size=10):
+def chip(draw, x, y, text, size=11):
     f = sans_b(size)
     w = tw(draw, text, f) + 12
     h = size + 8
@@ -258,13 +261,15 @@ def chip(draw, x, y, text, size=10):
     return w
 
 
-def kicker(draw, x, y, w, text, tag, base_size=10, min_size=7.5,
+def kicker(draw, x, y, w, text, tag, base_size=10, min_size=9,
            first_red=False):
-    """Dateline strip: text left, tag pill at the right end; shrinks to fit."""
+    """Dateline strip: text left, tag pill at the right end; shrinks to fit.
+    Pill text never below 11px."""
     size = base_size
+    pill_size = 11
     while size > min_size:
         f = sans_b(int(round(size)))
-        pill_w = tw(draw, tag, sans_b(int(round(size)))) + 12
+        pill_w = tw(draw, tag, sans_b(pill_size)) + 12
         if tw(draw, text, f) + 6 + pill_w <= w:
             break
         size -= 0.5
@@ -277,8 +282,8 @@ def kicker(draw, x, y, w, text, tag, base_size=10, min_size=7.5,
         draw.text((fx, y + 2), " \u00b7 " + rest, font=sans(ps), fill=GREY)
     else:
         draw.text((x, y + 2), text, font=f, fill=NAVY_D)
-    pill_w = tw(draw, tag, sans_b(ps)) + 12
-    chip(draw, x + w - pill_w, y, tag, size=ps)
+    pill_w = tw(draw, tag, sans_b(pill_size)) + 12
+    chip(draw, x + w - pill_w, y, tag, size=pill_size)
 
 
 def fit_font(draw, text, start, min_size, max_w, bold=True, serif_font=False):
@@ -381,65 +386,150 @@ def illu_rocket(draw, x, y, w, h):
 HERO_ILLU = {"hormuz": illu_hormuz, "kospi": illu_kospi, "rocket": illu_rocket}
 
 
-def illu_icon(draw, kind, x, y, w, h):
-    cx, cy = x + w // 2, y + h // 2
-    if kind == "treaty":  # paper sheet + seal
-        draw.rectangle([cx - 11, cy - 13, cx + 9, cy + 13], fill=(255, 255, 255),
-                       outline=NAVY, width=2)
-        for i, ly in enumerate((-7, -1, 5)):
-            draw.line([cx - 7, cy + ly, cx + 5, cy + ly], fill=NAVY, width=2)
-        draw.ellipse([cx + 3, cy + 3, cx + 15, cy + 15], fill=RUST)
-    elif kind == "port":  # crane + burst
-        draw.line([cx - 14, cy + 12, cx - 14, cy - 12], fill=NAVY, width=3)
-        draw.line([cx - 14, cy - 12, cx + 12, cy - 4], fill=NAVY, width=3)
-        draw.line([cx + 12, cy - 4, cx + 12, cy + 4], fill=NAVY, width=2)
-        draw.polygon([(cx + 2, cy + 8), (cx + 6, cy - 2), (cx + 10, cy + 8)],
-                     fill=(232, 126, 32))
+# --------------------------------------------------- grid mini-scenes ----
+def illu_scene(draw, kind, x, y, w, h):
+    """Small drawn scene (not a flat icon) for a grid card.
+    Band is ~189 x 42 px: sky + ground + 2-4 shapes."""
+    w, h = int(w), int(h)
+    if kind == "treaty":
+        # signing table: two figures, document, flags
+        draw.rectangle([x, y, x + w, y + h], fill=(232, 226, 214))
+        draw.rectangle([x, y + h - 12, x + w, y + h], fill=(150, 110, 70))
+        draw.rectangle([x + w // 2 - 26, y + h - 24, x + w // 2 + 26,
+                        y + h - 12], fill=(255, 255, 255), outline=NAVY,
+                       width=1)
+        for ly in (y + h - 21, y + h - 17):
+            draw.line([x + w // 2 - 20, ly, x + w // 2 + 20, ly],
+                      fill=NAVY, width=1)
+        for fx, col in ((x + 34, NAVY), (x + w - 34, TEAL)):
+            draw.ellipse([fx - 8, y + 4, fx + 8, y + 20],
+                         fill=(232, 190, 150))
+            draw.polygon([(fx - 14, y + h - 12), (fx - 10, y + 20),
+                          (fx + 10, y + 20), (fx + 14, y + h - 12)],
+                         fill=col)
+        draw.rectangle([x + 8, y + 6, x + 22, y + 14], fill=(41, 98, 168))
+        draw.rectangle([x + w - 22, y + 6, x + w - 8, y + 14], fill=TEAL)
+    elif kind == "port":
+        # port under strike: sky, sea, ship, crane, burst
+        draw.rectangle([x, y, x + w, y + h], fill=(214, 228, 240))
+        draw.rectangle([x, y + h - 12, x + w, y + h], fill=(24, 68, 96))
+        draw.line([x + 10, y + 6, x + 10, y + h - 12], fill=NAVY, width=3)
+        draw.line([x + 10, y + 6, x + 70, y + 16], fill=NAVY, width=3)
+        draw.polygon([(x + w // 2 - 40, y + h - 12),
+                      (x + w // 2 - 34, y + h - 24),
+                      (x + w // 2 + 44, y + h - 24),
+                      (x + w // 2 + 50, y + h - 12)], fill=(60, 30, 26))
+        draw.rectangle([x + w // 2 - 20, y + h - 32, x + w // 2 + 10,
+                        y + h - 24], fill=(232, 226, 214))
+        draw.polygon([(x + w - 30, y + 4), (x + w - 22, y + 16),
+                      (x + w - 14, y + 4)], fill=(232, 126, 32))
+        draw.ellipse([x + w - 34, y + 2, x + w - 10, y + 18],
+                     outline=(232, 126, 32), width=2)
     elif kind == "shirt":
-        draw.polygon([(cx - 12, cy - 8), (cx - 5, cy - 12), (cx + 5, cy - 12),
-                      (cx + 12, cy - 8), (cx + 16, cy + 2), (cx + 9, cy + 4),
-                      (cx + 9, cy + 13), (cx - 9, cy + 13), (cx - 9, cy + 4),
-                      (cx - 16, cy + 2)], fill=TEAL)
-    elif kind == "mine":  # tunnel arch + lamp
-        draw.pieslice([cx - 13, cy - 12, cx + 13, cy + 14], 180, 360, fill=NAVY)
-        draw.rectangle([cx - 13, cy, cx + 13, cy + 14], fill=NAVY)
-        draw.ellipse([cx - 3, cy + 2, cx + 3, cy + 8], fill=(246, 196, 70))
-    elif kind == "refinery":
-        draw.rectangle([cx - 14, cy - 4, cx - 4, cy + 13], fill=NAVY)
-        draw.rectangle([cx - 1, cy - 10, cx + 9, cy + 13], fill=NAVY)
-        draw.polygon([(cx + 12, cy + 2), (cx + 16, cy - 8), (cx + 20, cy + 2)],
-                     fill=(232, 126, 32))
-        draw.polygon([(cx - 9, cy - 4), (cx - 6, cy - 12), (cx - 3, cy - 4)],
-                     fill=(232, 126, 32))
-    elif kind == "building":
-        draw.rectangle([cx - 12, cy - 10, cx + 12, cy + 13], fill=NAVY)
-        for wy in (-5, 2):
-            for wx in (-8, -1, 6):
-                draw.rectangle([cx + wx, cy + wy, cx + wx + 4, cy + wy + 4],
-                               fill=(246, 196, 70))
-        draw.ellipse([cx + 8, cy - 16, cx + 14, cy - 10], fill=RUST)
-    elif kind == "bolt":
-        draw.polygon([(cx + 3, cy - 14), (cx - 7, cy + 1), (cx - 1, cy + 1),
-                      (cx - 4, cy + 14), (cx + 8, cy - 2), (cx + 1, cy - 2)],
+        # garment factory: rack of shirts over a workbench
+        draw.rectangle([x, y, x + w, y + h], fill=(228, 243, 241))
+        draw.rectangle([x, y + h - 14, x + w, y + h], fill=(150, 110, 70))
+        draw.line([x + 14, y + 6, x + w - 14, y + 6], fill=NAVY, width=2)
+        for sx, col in ((x + 40, TEAL), (x + w // 2, (178, 38, 30)),
+                        (x + w - 40, (46, 125, 50))):
+            draw.polygon([(sx - 12, y + 8), (sx - 5, y + 6), (sx + 5, y + 6),
+                          (sx + 12, y + 8), (sx + 16, y + 16),
+                          (sx + 9, y + 18), (sx + 9, y + h - 14),
+                          (sx - 9, y + h - 14), (sx - 9, y + 18),
+                          (sx - 16, y + 16)], fill=col)
+    elif kind == "mine":
+        # mine cross-section: earth layers, tunnel, lamp glow
+        draw.rectangle([x, y, x + w, y + h], fill=(120, 84, 50))
+        draw.rectangle([x, y + 12, x + w, y + 20], fill=(96, 64, 38))
+        draw.pieslice([x + w // 2 - 22, y + 8, x + w // 2 + 22, y + h],
+                      180, 360, fill=(20, 20, 20))
+        draw.rectangle([x + w // 2 - 22, y + h // 2, x + w // 2 + 22, y + h],
+                       fill=(20, 20, 20))
+        draw.ellipse([x + w // 2 - 6, y + h - 16, x + w // 2 + 6, y + h - 4],
                      fill=(246, 196, 70))
+        draw.line([x + 10, y + 4, x + w - 10, y + 4], fill=(246, 196, 70),
+                  width=1)
+    elif kind == "refinery":
+        # refinery towers, flames, smoke
+        draw.rectangle([x, y, x + w, y + h], fill=(232, 226, 214))
+        draw.rectangle([x, y + h - 8, x + w, y + h], fill=(120, 120, 110))
+        draw.rectangle([x + 20, y + 10, x + 44, y + h - 8], fill=NAVY)
+        draw.rectangle([x + 52, y + 4, x + 72, y + h - 8], fill=NAVY)
+        draw.rectangle([x + 84, y + 16, x + 100, y + h - 8],
+                       fill=(60, 60, 60))
+        for fx in (x + 32, x + 62):
+            draw.polygon([(fx - 8, y + 10), (fx, y + 1), (fx + 8, y + 10)],
+                         fill=(232, 126, 32))
+        draw.ellipse([x + w - 40, y + 2, x + w - 24, y + 14],
+                     fill=(150, 150, 145))
+        draw.ellipse([x + w - 52, y + 8, x + w - 38, y + 20],
+                     fill=(170, 170, 165))
+    elif kind == "building":
+        # apartment block at night, lit windows, smoke, rubble
+        draw.rectangle([x, y, x + w, y + h], fill=NAVY_D)
+        draw.rectangle([x + 24, y + 6, x + w - 60, y + h],
+                       fill=(40, 60, 90))
+        for wy in (y + 12, y + 22, y + 32):
+            for wx in (x + 32, x + 48, x + 64):
+                draw.rectangle([wx, wy, wx + 8, wy + 6], fill=(246, 196, 70))
+        draw.ellipse([x + w - 44, y + 2, x + w - 24, y + 16],
+                     fill=(120, 120, 115))
+        draw.ellipse([x + w - 56, y + 10, x + w - 38, y + 24],
+                     fill=(100, 100, 95))
+        draw.polygon([(x + 8, y + h), (x + 20, y + h - 10), (x + 34, y + h)],
+                     fill=(120, 120, 110))
+    elif kind == "bolt":
+        # house + lightning bolt + price tag
+        draw.rectangle([x, y, x + w, y + h], fill=(255, 251, 240))
+        draw.polygon([(x + 30, y + 12), (x + 70, y + 12), (x + 50, y + 2)],
+                     fill=RUST)
+        draw.rectangle([x + 34, y + 12, x + 66, y + h - 6], fill=NAVY)
+        draw.rectangle([x + 46, y + 22, x + 54, y + h - 6],
+                       fill=(246, 196, 70))
+        draw.polygon([(x + w - 40, y + 2), (x + w - 52, y + 20),
+                      (x + w - 44, y + 20), (x + w - 50, y + 36),
+                      (x + w - 30, y + 14), (x + w - 38, y + 14)],
+                     fill=(246, 196, 70))
+        draw.ellipse([x + w - 66, y + 4, x + w - 52, y + 18], fill=GOLD)
+        draw.text((x + w - 62, y + 6), "\u00a3", font=sans_b(10),
+                  fill=NAVY_D)
     elif kind == "shield":
-        draw.polygon([(cx - 11, cy - 11), (cx + 11, cy - 11), (cx + 11, cy + 1),
-                      (cx, cy + 14), (cx - 11, cy + 1)], fill=NAVY)
-        draw.line([cx - 5, cy, cx - 1, cy + 5, cx + 6, cy - 5], fill=(255, 255, 255),
-                  width=2)
+        # police shield + flank markers
+        draw.rectangle([x, y, x + w, y + h], fill=(228, 243, 241))
+        draw.polygon([(x + w // 2 - 20, y + 4), (x + w // 2 + 20, y + 4),
+                      (x + w // 2 + 20, y + 18), (x + w // 2, y + h - 6),
+                      (x + w // 2 - 20, y + 18)], fill=NAVY)
+        draw.line([x + w // 2 - 10, y + 20, x + w // 2 - 3, y + 27,
+                   x + w // 2 + 11, y + 12], fill=(255, 255, 255), width=3)
+        draw.ellipse([x + 12, y + 8, x + 24, y + 20], fill=RUST)
+        draw.ellipse([x + w - 24, y + 8, x + w - 12, y + 20], fill=RUST)
     elif kind == "scales":
-        draw.line([cx, cy - 12, cx, cy + 12], fill=NAVY, width=2)
-        draw.line([cx - 12, cy - 10, cx + 12, cy - 10], fill=NAVY, width=2)
-        draw.arc([cx - 14, cy - 2, cx - 4, cy + 8], 0, 180, fill=NAVY, width=2)
-        draw.arc([cx + 4, cy - 2, cx + 14, cy + 8], 0, 180, fill=NAVY, width=2)
-        draw.ellipse([cx - 2, cy - 14, cx + 2, cy - 10], fill=RUST)
-    elif kind == "stars":  # EU circle of stars
+        # courthouse: pediment, columns, base, small scales
+        draw.rectangle([x, y, x + w, y + h], fill=(232, 226, 214))
+        draw.polygon([(x + w // 2 - 34, y + 8), (x + w // 2 + 34, y + 8),
+                      (x + w // 2, y + 2)], fill=NAVY)
+        for cx in (x + w // 2 - 28, x + w // 2 - 6, x + w // 2 + 16):
+            draw.rectangle([cx, y + 10, cx + 6, y + h - 6],
+                           fill=(255, 255, 255), outline=NAVY, width=1)
+        draw.rectangle([x + w // 2 - 40, y + h - 8, x + w // 2 + 40,
+                        y + h - 4], fill=NAVY)
+        scx, scy = x + w - 30, y + 18
+        draw.line([scx, scy - 6, scx, scy + 12], fill=RUST, width=2)
+        draw.line([scx - 10, scy - 4, scx + 10, scy - 4], fill=RUST, width=2)
+    elif kind == "stars":
+        # EU circle of stars + chip in the middle
+        draw.rectangle([x, y, x + w, y + h], fill=(30, 58, 95))
         import math
         for k in range(12):
             ang = math.radians(k * 30 - 90)
-            sx = cx + int(11 * math.cos(ang))
-            sy = cy + int(11 * math.sin(ang))
+            sx = x + w // 2 + int(15 * math.cos(ang))
+            sy = y + h // 2 + int(15 * math.sin(ang))
             draw.ellipse([sx - 2, sy - 2, sx + 2, sy + 2], fill=GOLD)
+        draw.rectangle([x + w // 2 - 7, y + h // 2 - 7,
+                        x + w // 2 + 7, y + h // 2 + 7],
+                       fill=(255, 255, 255), outline=GOLD, width=1)
+        draw.rectangle([x + w // 2 - 3, y + h // 2 - 3,
+                        x + w // 2 + 3, y + h // 2 + 3], fill=TEAL)
 
 
 # ------------------------------------------------------------- map --------
@@ -450,7 +540,7 @@ CONTINENTS = [  # (lon, lat, rx, ry) in map-box px, box is 664 x 96
 ]
 PINS = [  # (story no, lon, lat)
     (1, 56, 26), (2, 127, 37), (3, 98, 40), (4, 149, -35),
-    (5, 43, 15), (7, 107, -6), (10, 0, 51), (13, 8, 49),
+    (5, 43, 15), (7, 107, -6), (10, -4, 52), (13, 10, 48),
 ]
 
 
@@ -480,9 +570,9 @@ def draw_map(draw, x, y, w, h):
         yy += step
     for n, lon, lat in PINS:
         px_, py_ = px(lon, lat)
-        draw.ellipse([px_ - 7, py_ - 7, px_ + 7, py_ + 7], fill=RUST,
+        draw.ellipse([px_ - 8, py_ - 8, px_ + 8, py_ + 8], fill=RUST,
                      outline=(255, 255, 255), width=1)
-        f = sans_b(9)
+        f = sans_b(10)
         t = str(n)
         draw.text((px_ - tw(draw, t, f) / 2, py_ - 5), t, font=f,
                   fill=(255, 255, 255))
@@ -493,7 +583,7 @@ def section_masthead(draw):
     draw.rectangle([0, 0, W, 20], fill=(0, 0, 0))
     fb = sans_b(11)
     draw.text((M, 4), "THE WORLD IN ONE DAY", font=fb, fill=GOLD)
-    right = "40 STORIES \u00b7 ALL FROM WEDNESDAY 25 NOVEMBER 2026"
+    right = "33 STORIES \u00b7 ALL FROM WEDNESDAY 25 NOVEMBER 2026"
     draw.text((W - M - tw(draw, right, fb), 4), right, font=fb,
               fill=(255, 255, 255))
     draw.rectangle([0, 20, W, 88], fill=CREAM)
@@ -516,12 +606,12 @@ def section_masthead(draw):
 
 
 def section_regions(draw):
-    widths = [179, 154, 269, 128, 102, 128, 64]
+    widths = [218, 186, 248, 124, 93, 93, 62]
     x = 0
     for (name, n), wseg in zip(REGIONS, widths):
         draw.rectangle([x, 88, x + wseg, 114], fill=REGION_COLORS[name])
         text = "%s %d" % (name, n)
-        f = fit_font(draw, text, 13, 9, wseg - 8, bold=True)
+        f = fit_font(draw, text, 13, 11, wseg - 8, bold=True)
         draw.text((x + (wseg - tw(draw, text, f)) / 2, 95), text, font=f,
                   fill=(255, 255, 255))
         x += wseg
@@ -533,7 +623,7 @@ def section_utc(draw):
     for t, label in UTC_ITEMS:
         segs.append("%s %s" % (t, label))
     text = "   \u00b7   ".join(segs)
-    f = fit_font(draw, text, 13, 9, CW, bold=False)
+    f = fit_font(draw, text, 13, 11, CW, bold=False)
     draw.text(((W - tw(draw, text, f)) / 2, 121), text, font=f, fill=NAVY_D)
     draw.line([M, 140, W - M, 140], fill=(200, 200, 190), width=1)
 
@@ -555,13 +645,13 @@ def section_numbers(draw):
 
 
 def section_heroes(draw, img):
-    y0, y1 = 196, 414
+    y0, y1 = 196, 418
     col_w = (CW - 2 * 12) / 3.0
     for i, hero in enumerate(HEROES):
         x = M + i * (col_w + 12)
         draw.rectangle([x, y0, x + col_w, y1], fill=PAPER,
                        outline=(210, 206, 192), width=1)
-        ih = 96
+        ih = 88
         iw = int(col_w - 2)
         box = Image.new("RGB", (iw, ih), PAPER)
         bd = ImageDraw.Draw(box)
@@ -572,92 +662,125 @@ def section_heroes(draw, img):
                   stroke_width=2, stroke_fill=NAVY_D)
         # kicker strip below the illustration, tag pill at its right end
         ky = y0 + ih + 1
-        draw.line([x + 1, ky + 18, x + col_w - 1, ky + 18],
+        draw.line([x + 1, ky + 20, x + col_w - 1, ky + 20],
                   fill=(210, 206, 192), width=1)
         kicker(draw, x + 8, ky, col_w - 16, HERO_KICKERS[i],
-               hero["tag"], base_size=10, min_size=8, first_red=True)
-        ty = y0 + ih + 24
+               hero["tag"], base_size=10, min_size=9, first_red=True)
+        ty = y0 + ih + 26
         ty = draw_wrapped(draw, hero["head"], serif_b(19), x + 10, ty,
-                          col_w - 20, NAVY_D, leading=23)
-        draw_wrapped(draw, hero["deck"], sans(12), x + 10, ty + 4,
-                     col_w - 20, INK, leading=15)
+                          col_w - 20, NAVY_D, leading=22)
+        ty = draw_wrapped(draw, hero["deck"], sans(12), x + 10, ty + 4,
+                          col_w - 20, INK, leading=15)
+        draw.text((x + 10, ty + 2), HERO_SOURCES[i], font=sans(9.5),
+                  fill=GREY)
 
 
 def section_grid(draw):
-    y0 = 414
+    y0 = 436
     col_w = (CW - 4 * 8) / 5.0
-    row_h, gap = 126, 4
+    row_h, gap = 129, 4
     for idx, card in enumerate(GRID):
         r, c = divmod(idx, 5)
         x = M + c * (col_w + gap)
         y = y0 + r * (row_h + gap)
         draw.rectangle([x, y, x + col_w, y + row_h], fill=PAPER,
                        outline=(210, 206, 192), width=1)
-        ih = 32
-        draw.rectangle([x + 1, y + 1, x + col_w - 1, y + ih],
-                       fill=SKY if idx % 2 == 0 else TEAL_L)
-        illu_icon(draw, card["illu"], x, y + 1, col_w, ih)
+        ih = 42
+        illu_scene(draw, card["illu"], x + 1, y + 1, col_w - 2, ih)
+        draw.rounded_rectangle([x + 3, y + 3, x + 21, y + 17],
+                               radius=3, fill=(255, 255, 255))
         draw.text((x + 6, y + 4), str(card["n"]), font=sans_b(11),
                   fill=NAVY_D)
-        # kicker strip below the icon strip, tag pill at its right end
+        # kicker strip below the scene, tag pill at its right end
         ky = y + ih + 1
-        draw.line([x + 1, ky + 14, x + col_w - 1, ky + 14],
+        draw.line([x + 1, ky + 20, x + col_w - 1, ky + 20],
                   fill=(210, 206, 192), width=1)
         kicker(draw, x + 6, ky, col_w - 12, GRID_KICKERS[idx],
-               card["tag"], base_size=9, min_size=7.5, first_red=False)
-        ty = draw_wrapped(draw, card["head"], sans_b(12), x + 7, y + ih + 17,
+               card["tag"], base_size=9, min_size=9, first_red=False)
+        ty = draw_wrapped(draw, card["head"], sans_b(12), x + 7, y + ih + 23,
                           col_w - 14, NAVY_D, leading=13.5)
-        draw_wrapped(draw, card["deck"], sans(10), x + 7, ty + 2,
+        draw_wrapped(draw, card["deck"], sans(10.5), x + 7, ty + 2,
                      col_w - 14, INK, leading=11.5)
 
 
-def section_legend_map(draw):
-    y0, y1 = 670, 758
+def section_legend_strip(draw):
+    y0 = 418
+    draw.rectangle([0, y0, W, 436], fill=CREAM)
+    draw.text((M, y0 + 4), "HOW SURE", font=sans_b(11), fill=NAVY_D)
+    items = [
+        ("OFFICIAL", "government or agency"),
+        ("CONFIRMED", "two or more sources"),
+        ("REPORTED", "one reputable source"),
+        ("CLAIM", "one party's claim"),
+    ]
+    x = M + 92
+    for tag, meaning in items:
+        draw.rectangle([x, y0 + 6, x + 9, y0 + 15], fill=TAG_COLOR[tag])
+        x += 13
+        t = "%s: %s" % (tag, meaning)
+        draw.text((x, y0 + 4), t, font=sans(10), fill=INK)
+        x += tw(draw, t, sans(10)) + 18
+
+
+def section_map(draw):
+    y0, y1 = 698, 772
     draw.rectangle([0, y0, W, y1], fill=CREAM)
     draw.line([M, y0, W - M, y0], fill=(200, 196, 182), width=1)
-    draw.text((M, y0 + 8), "HOW SURE", font=sans_b(13), fill=NAVY_D)
-    defs = [
-        ("OFFICIAL", "government or agency announcement"),
-        ("CONFIRMED", "two or more independent sources agree"),
-        ("REPORTED", "one reputable source or wire"),
-        ("CLAIM", "one party's assertion, not confirmed"),
-    ]
-    yy = y0 + 28
-    for tag, meaning in defs:
-        draw.rectangle([M, yy + 2, M + 10, yy + 12], fill=TAG_COLOR[tag])
-        draw.text((M + 14, yy), tag, font=sans_b(10), fill=INK)
-        draw.text((M + 88, yy), meaning, font=sans(10), fill=GREY)
-        yy += 15
-    mx = M + 330
-    draw.text((mx, y0 + 8), "WHERE IT HAPPENED", font=sans_b(13),
-              fill=NAVY_D)
-    draw_map(draw, mx, y0 + 26, W - M - mx, y1 - y0 - 30)
+    draw.text((M, y0 + 5), "WHERE IT HAPPENED \u00b7 PINS = STORY NUMBERS",
+              font=sans_b(13), fill=NAVY_D)
+    draw_map(draw, M, y0 + 20, CW, 40)
+    lx = M
+    ly = y0 + 62
+    for name in ["ASIA", "MIDDLE EAST", "EUROPE", "AMERICAS", "AFRICA",
+                 "OCEANIA", "WORLD"]:
+        draw.rectangle([lx, ly, lx + 8, ly + 8], fill=REGION_COLORS[name])
+        lx += 11
+        label = name.title()
+        draw.text((lx, ly - 1), label, font=sans(9), fill=GREY)
+        lx += tw(draw, label, sans(9)) + 12
 
 
 def section_also(draw):
-    y0 = 758
-    draw.text((M, y0), "IN BRIEF \u2014 27 MORE", font=sans_b(13),
+    y0 = 772
+    draw.text((M, y0), "IN BRIEF \u2014 20 MORE", font=sans_b(13),
               fill=NAVY_D)
-    draw.line([M + 170, y0 + 8, W - M, y0 + 8], fill=(200, 196, 182), width=1)
+    draw.line([M + 172, y0 + 8, W - M, y0 + 8], fill=(200, 196, 182), width=1)
     col_w = (CW - 2 * 16) / 3.0
     for idx, item in enumerate(ALSO):
-        c, r = divmod(idx, 9)
+        c, r = divmod(idx, 7)
         x = M + c * (col_w + 16)
-        y = y0 + 20 + r * 18
+        y = y0 + 20 + r * 19
         draw.text((x, y), "%d." % (14 + idx), font=sans_b(12), fill=RUST)
         draw.text((x + 26, y), item, font=sans(12), fill=INK)
 
 
+def section_sources(draw):
+    draw.text((M, 920),
+              "Sources: Reuters \u00b7 Xinhua \u00b7 AFP \u00b7 AP \u00b7 Al Jazeera "
+              "\u00b7 Anadolu \u00b7 WSJ \u00b7 BBC \u00b7 Ofgem \u00b7 UN Women \u00b7 ABS",
+              font=sans(9), fill=GREY)
+
+
 def section_datecheck(draw):
-    y0, y1 = 936, 1024
+    y0, y1 = 930, 998
     draw.rectangle([0, y0, W, y1], fill=RUST_L)
     draw.line([0, y0, W, y0], fill=RUST, width=3)
-    draw.text((M, y0 + 6), "DATE CHECK \u2014 WHAT WE LEFT OUT",
-              font=sans_b(13), fill=RUST)
-    y = draw_wrapped(draw, DATE_CHECK_NOT, sans(10.5), M, y0 + 24,
-                     CW, (90, 20, 18), leading=13)
-    draw_wrapped(draw, DATE_CHECK_YET, sans_b(10.5), M, y + 3, CW, RUST,
-                 leading=13)
+    draw.text((M, y0 + 4), "DATE CHECK \u2014 WHAT WE LEFT OUT",
+              font=sans_b(12), fill=RUST)
+    y = draw_wrapped(draw, DATE_CHECK_NOT, sans(10), M, y0 + 18,
+                     CW, (90, 20, 18), leading=12)
+    draw_wrapped(draw, DATE_CHECK_YET, sans_b(10), M, y + 2, CW, RUST,
+                 leading=12)
+
+
+def section_footer(draw):
+    y0 = 998
+    draw.rectangle([0, y0, W, 1024], fill=(0, 0, 0))
+    text = ("DRAWN BY AN AI AGENT FOR MAKE.FUN \u00b7 "
+            "WEDNESDAY 25 NOVEMBER 2026 \u00b7 ONE DAY, ONE PAGE")
+    f = sans_b(11)
+    draw.text(((W - tw(draw, text, f)) / 2, y0 + 7), text, font=f,
+              fill=GOLD)
 
 
 # ---------------------------------------------------------------- main ----
@@ -669,10 +792,13 @@ def build():
     section_utc(draw)
     section_numbers(draw)
     section_heroes(draw, img)
+    section_legend_strip(draw)
     section_grid(draw)
-    section_legend_map(draw)
+    section_map(draw)
     section_also(draw)
+    section_sources(draw)
     section_datecheck(draw)
+    section_footer(draw)
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "entry.png")
     img.save(out, "PNG", optimize=True)
     return out
